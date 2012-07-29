@@ -1,0 +1,65 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+  <script type="text/javascript">
+  var MESSAGE = "Hello Mr. Server !"
+  var start = new Date().getTime()
+  var ready = function () {
+    if(!("WebSocket" in window)){  
+      document.write('<p>Oh no, you need a browser that supports WebSockets. How about <a href="http://www.,mozilla.org/firefox">Mozilla Firefox</a>?</p>');
+    }else {  
+        //The user has WebSockets  
+        var console = document.getElementById('console');
+        function connect() {
+          var socket;  
+          var host = "ws://localhost:8080/";  
+          
+          try{  
+            socket = new WebSocket(host);  
+            
+            message('Socket Status: '+socket.readyState);  
+            
+            socket.onopen = function(){
+             message('Socket Status: '+socket.readyState+' (Open)');  
+             socket.send(MESSAGE);
+           }  
+           
+           socket.onmessage = function(msg){  
+            end = new Date().getTime()
+            time = (end - start)
+            update(msg.data)
+            socket.send(MESSAGE);
+            start = new Date().getTime()
+          }  
+          
+          socket.onclose = function(){  
+            message('Status: '+socket.readyState+' (Closed)');
+          }           
+          
+        } catch(exception){  
+         message('Error: '+exception);
+       }  
+       
+       function sendHeartBeat(){  
+        socket.send("Hello Mr. Server!");
+      }  
+      
+      function update(data) {
+        console.innerHTML = data
+      }
+      
+      function message(msg){  
+        document.innerHTML += "<p>" + msg + "</p>"
+      }  
+    }
+    connect();
+  }
+};  
+</script>
+<title>WebSockets Client</title>  
+
+</head>  
+<body onload="ready();" >  
+  <pre id="console" style="background-color:black; color: #00FF33; font-family: Courier" ></pre>
+</body>  
+</html>
